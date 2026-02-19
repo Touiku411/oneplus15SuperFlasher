@@ -38,10 +38,10 @@ int main()
         fs::create_directory(imagesDir);
     }
     if (!fs::exists(otaDir)) {
-        fs::create_directory(imagesDir);
+        fs::create_directory(otaDir);
     }
     if (!fs::exists(toolsDir)) {
-        fs::create_directory(imagesDir);
+        fs::create_directory(toolsDir);
     }
     cout << "---------ONEPLUS 15 升降級工具---------" << endl;
     int choice;
