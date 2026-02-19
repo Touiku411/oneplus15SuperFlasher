@@ -8,18 +8,22 @@
 
 using namespace std;
 namespace fs = std::filesystem;
+void test();
 void unPack();
 void ClearOTA();
 void ClearImages();
 void Start();
 int enterChoice() {
+    cout << "---------ONEPLUS 15 升降級工具---------" << endl;
+    cout << "請將更新包更改名稱為update.zip，並放入ota資料夾下\n";
     cout << "\n輸入你的選擇\n"
-        << "1.解包全量包\n"
-        << "2.清空ota文件\n"
-        << "3.清空images文件\n"
-        << "4.開始刷機\n"
-        << "5.END\n"
-        << "?";
+        << "1.測試環境\n"
+        << "2.解包全量包\n"
+        << "3.清空ota文件\n"
+        << "4.清空images文件\n"
+        << "5.開始刷機\n"
+        << "6.END\n"
+        << "? ";
     int choice;
     cin >> choice;
     return choice;
@@ -30,34 +34,37 @@ fs::path imagesDir = L"images";
 fs::path toolsDir = L"tools";
 fs::path payloadPath = toolsDir / L"payload-dumper-go.exe";
 fs::path fastbootPath = toolsDir / L"fastboot.exe";
-fs::path adbPath = toolsDir / L"fastboot.exe";
+fs::path adbPath = toolsDir / L"adb.exe";
 
 int main()
 {
-    if (!fs::exists(imagesDir)) {
+    if (!fs::exists(imagesDir))
         fs::create_directory(imagesDir);
     }
     if (!fs::exists(otaDir)) {
-        fs::create_directory(otaDir);
+        fs::create_directory(imagesDir);
     }
     if (!fs::exists(toolsDir)) {
-        fs::create_directory(toolsDir);
+        fs::create_directory(imagesDir);
     }
     cout << "---------ONEPLUS 15 升降級工具---------" << endl;
     int choice;
 
-    while ((choice = enterChoice()) != 5) {
+    while ((choice = enterChoice()) != 6) {
         switch (choice) {
         case 1:
-            unPack();
+            test();
             break;
         case 2:
-            ClearOTA();
+            unPack();
             break;
         case 3:
-            ClearImages();
+            ClearOTA();
             break;
         case 4:
+            ClearImages();
+            break;
+        case 5:
             Start();
             break;
         default:
@@ -65,6 +72,12 @@ int main()
         }
     }
 
+}
+void test() {
+    wstring cmd = L"\"\"" + fastbootPath.wstring() + L"\" devices\"";
+    _wsystem(cmd.c_str());
+    system("pause");
+    system("cls");
 }
 void unPack() {
     //解包zip.
@@ -80,12 +93,14 @@ void unPack() {
     else {
         cout << "ERROR:系統找不到 /ota/update.zip \n";
         system("pause");
+        system("cls");
         return;
     }
     fs::path BinPath = otaDir / L"payload.bin";
     if (!fs::exists(BinPath)) {
         cout << "提取payload.bin失敗\n" << "確認檔案是否存在\n";
         system("pause");
+        system("cls");
         return;
     }
     //解包bin
@@ -96,17 +111,18 @@ void unPack() {
     if (BinResult == 0) {
         cout << "\n解包payload.bin成功\n";
     }
+    system("pause");
+    system("cls");
 }
 void ClearOTA() {
     if (fs::exists(otaDir)) {
         char choice;
-        cout << "確認刪除?[y/n]\n";
+        cout << "確認刪除?[y/n]";
         cin >> choice;
-        if (choice == 'y') {
+        if (choice == 'y' || choice == 'Y') {
             uintmax_t count = fs::remove_all(otaDir);
             fs::create_directory(otaDir);
             cout << "刪除完成，案任意鍵返回\n";
-            system("pause");
             /*for (auto &entry : fs::directory_iterator(otaDir)) {
                 try {
                     fs::remove(entry.path());
@@ -118,8 +134,9 @@ void ClearOTA() {
         }
         else {
             cout << "已取消刪除\n";
-            return;
         }
+        system("pause");
+        system("cls");
     }
     else {
         fs::create_directory(otaDir);
@@ -128,22 +145,22 @@ void ClearOTA() {
 void ClearImages() {
     if (fs::exists(imagesDir)) {
         char choice;
-        cout << "確認刪除?[y/n]\n";
+        cout << "確認刪除?[y/n]";
         cin >> choice;
-        if (choice == 'y') {
+        if (choice == 'y' || choice == 'Y') {
             uintmax_t count = fs::remove_all(imagesDir);
             fs::create_directory(imagesDir);
             cout << "刪除完成，案任意鍵返回\n";
-            system("pause");
         }
         else {
             cout << "已取消刪除\n";
-            return;
         }
     }
     else {
         fs::create_directory(imagesDir);
     }
+    system("pause");
+    system("cls");
 }
 void Start() {
     int choice;
