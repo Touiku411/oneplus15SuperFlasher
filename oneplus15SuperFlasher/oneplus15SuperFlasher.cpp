@@ -5,24 +5,47 @@
 #include <filesystem>
 #include <chrono>
 #include <thread>
+#include <windows.h>
 
 using namespace std;
 namespace fs = std::filesystem;
-void test();
+void Environment();
+void bootTobootloader();
+void bootToRecovery();
 void unPack();
 void ClearOTA();
 void ClearImages();
 void Start();
+void shengjianji();
+void jiuzhuan();
 int enterChoice() {
-    cout << "---------ONEPLUS 15 升降級工具---------" << endl;
-    cout << "請將更新包更改名稱為update.zip，並放入ota資料夾下\n";
-    cout << "\n輸入你的選擇\n"
+    cout << "       ---------ONEPLUS 15 升降級工具---------" << endl;
+    cout << "\033[1;31m";
+    cout << "====================================================\n"
+         << "!僅限[一加15]使用，若使用其他機型導致變磚，一概不負責!\n"
+         << "!請將ota包更改名稱為update.zip，並放入ota資料夾下!\n"
+         << "====================================================\n";
+    cout << "\033[0m\n";
+    cout << "=> 輸入你的選擇\n"
         << "1.測試環境\n"
         << "2.解包全量包\n"
-        << "3.清空ota文件\n"
-        << "4.清空images文件\n"
+        << "3.清空ota資料夾\n"
+        << "4.清空images資料夾\n"
         << "5.開始刷機\n"
         << "6.END\n"
+        << "? ";
+    int choice;
+    cin >> choice;
+    return choice;
+}
+int enterChoice2() {
+    system("cls");
+    cout << "一些實用指令\n" << endl;
+    cout << "1.adb devices\n"
+        << "2.fastboot devices\n"
+        << "3.重啟至 bootloader\n"
+        << "4.重啟至 Recovery\n"
+        << "5.返回\n"
         << "? ";
     int choice;
     cin >> choice;
@@ -38,6 +61,7 @@ fs::path adbPath = toolsDir / L"adb.exe";
 
 int main()
 {
+    system("chcp 65001 > nul");
     if (!fs::exists(imagesDir))
         fs::create_directory(imagesDir);
     if (!fs::exists(otaDir))
@@ -48,27 +72,88 @@ int main()
 
     while ((choice = enterChoice()) != 6) {
         switch (choice) {
+            case 1:
+                Environment();
+                break;
+            case 2:
+                unPack();
+                break;
+            case 3:
+                ClearOTA();
+                break;
+            case 4:
+                ClearImages();
+                break;
+            case 5:
+                Start();
+                break;
+            default:
+                break;
+            }
+    }
+
+}
+void Environment() {
+    int choice;
+    while ((choice = enterChoice2()) != 5) {
+        switch (choice) {
         case 1:
-            unPack();
+            cout << "\n若什麼都沒顯示代表adb沒識別到裝置，請先嘗試安裝驅動\n\n";
+            _wsystem((L"\"\"" + adbPath.wstring() + L"\" devices\"").c_str());
+            system("pause");
             break;
         case 2:
-            ClearOTA();
+            cout << "\n若什麼都沒顯示代表fastboot沒識別到裝置，請確認已處於fastboot或bootloader模式下，或者請先嘗試安裝驅動\n\n";
+            _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" devices\"").c_str());
+            system("pause");
+            break;
+        case 3:
+            bootTobootloader();
             break;
         case 4:
-            ClearImages();
-            break;
-        case 5:
-            Start();
+            bootToRecovery();
             break;
         default:
             break;
         }
     }
-
+    
 }
-void test() {
-    wstring cmd = L"\"\"" + fastbootPath.wstring() + L"\" devices\"";
-    _wsystem(cmd.c_str());
+void bootTobootloader() {
+    wstring cmd1 = L"\"\"" + adbPath.wstring() + L"\" reboot bootloader 2>nul\"";
+    wstring cmd2 = L"\"\"" + fastbootPath.wstring() + L"\" reboot bootloader\"";
+    int result1 = _wsystem(cmd1.c_str());
+    if (result1 != 0) {
+        int result2 = _wsystem(cmd2.c_str());
+        if (result2 != 0) {
+            cout << "失敗\n";
+        }
+        else {
+            cout << "\n正在重啟至bootloader\n\n";
+        }
+    }
+    else {
+        cout << "\n正在重啟至bootloader\n\n";
+    }
+    system("pause");
+    system("cls");
+}
+void bootToRecovery() {
+    wstring cmd1 = L"\"\"" + adbPath.wstring() + L"\" reboot recovery 2>nul\"";
+    wstring cmd2 = L"\"\"" + fastbootPath.wstring() + L"\" reboot recovery\"";
+    int result1 = _wsystem(cmd1.c_str());
+    if (result1 != 0) {
+        int result2 = _wsystem(cmd2.c_str());
+        if (result2 != 0) {
+            cout << "失敗\n";
+        }
+        else {
+            cout << "\n正在重啟至Recovery\n\n";
+        }
+    }
+    else {
+        cout << "\n正在重啟至Recovery\n\n";
+    }
     system("pause");
     system("cls");
 }
@@ -80,8 +165,9 @@ void unPack() {
     wstring UnpackZipCmd = L"\"\"" + sevenZipPath.wstring() + L"\" x \"" + updatezipPath.wstring() + L"\" \"payload.bin\" -o\"" + otaDir.wstring() + L"\"\"";
     int ZipResult = _wsystem(UnpackZipCmd.c_str());
     if (ZipResult == 0) {
-        cout << "\n解壓縮update.zip成功\n";
-        system("pause");
+        cout << "\n解壓縮update.zip成功\n"
+             << "按任意鍵繼續提取payload.bin....\n\n";
+        system("pause > nul");
     }
     else {
         cout << "ERROR:系統找不到 /ota/update.zip \n";
@@ -98,7 +184,7 @@ void unPack() {
     }
     //解包bin
     //payload.exe -o "輸出" "輸入"
-    cout << "\n開始解包payload.bin\n";
+    cout << "\n開始解包payload.bin\n\n";
     wstring ExtractBincmd = L"\"\"" + payloadPath.wstring() + L"\" -o \"" + imagesDir.wstring() + L"\" \"" + BinPath.wstring() + L"\"\"";
     int BinResult = _wsystem(ExtractBincmd.c_str());
     if (BinResult == 0) {
@@ -159,31 +245,32 @@ void Start() {
     int choice;
     do {
         cout << "1.升/降級?\n"
-            << "2.返回\n"
+            << "2.救磚(限同版本刷入)\n"
+            << "3.返回\n"
             << "?";
         cin >> choice;
-        if (choice == 2) {
+        if (choice == 3) {
+            system("cls");
             return;
         }
-    } while (choice < 1 || choice > 1);
+    } while (choice < 1 || choice > 2);
+    switch (choice) {
+        case 1:
+            shengjianji();
+            break;
+        case 2:
+            jiuzhuan();
+            break;
+        default:
+            break;
+    }
 
+}
+void shengjianji() {
     vector<wstring> cowPartitions = {
-    L"system",
-    L"system_dlkm",
-    L"system_ext",
-    L"vendor",
-    L"product",
-    L"odm",
-    L"my_bigball",
-    L"my_carrier",
-    L"my_engineering",
-    L"my_heytap",
-    L"my_manifest",
-    L"my_product",
-    L"my_region",
-    L"my_stock",
-    L"odm_dlkm",
-    L"vendor_dlkm"
+    L"system", L"system_dlkm", L"system_ext", L"vendor",L"product",
+    L"odm",L"my_bigball",L"my_carrier",L"my_engineering",L"my_heytap",
+    L"my_manifest",L"my_product",L"my_region", L"my_stock", L"odm_dlkm", L"vendor_dlkm"
     };
     vector<wstring> fwPartitions = {
         //實體底層
@@ -205,15 +292,13 @@ void Start() {
     _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash modem_b \"" + modem_path.wstring() + L"\"\"").c_str());
     cout << "\n正在進入Fastboot模式，請勿動手機和電腦\n";
     _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" reboot fastboot\"").c_str());
-    cout << "\n請等待10秒，否則會出錯\n";
+    cout << "\n請等待10秒...\n";
     this_thread::sleep_for(chrono::seconds(10));
     //bin\fastboot delete-logical-partition system_a-cow
-    cout << "\n[處理中]清除COW暫存空間\n";
     for (const wstring& s : cowPartitions) {
         _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" delete-logical-partition " + s + L"_a-cow\"").c_str());
         _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" delete-logical-partition " + s + L"_b-cow\"").c_str());
     }
-    cout << "COW 暫存空間清除完成\n";
     //bin\fastboot flash vbmeta_a images\vbmeta.img
     //bin\fastboot flash vbmeta_b images\vbmeta.img
     for (const wstring& s : fwPartitions) {
@@ -237,5 +322,71 @@ void Start() {
     }
     cout << "\n請在手機選擇語言，並選擇格式化數據後重啟\n";
     cout << "刷機完成，按任意鍵返回主頁\n";
-    system("pause");
+    system("pause > nul");
+    system("cls");
+}
+void jiuzhuan() {
+    vector<wstring> preFwPartitions = {
+        L"vbmeta", L"vbmeta_system", L"vbmeta_vendor", L"vendor_boot", L"init_boot",
+        L"boot", L"recovery", L"modem", L"bluetooth", L"cpucp", L"cpucp_dtb",
+        L"dsp", L"dtbo", L"engineering_cdt", L"featenabler", L"oplus_sec",
+        L"shrm", L"splash", L"uefi"
+    };
+    vector<wstring> cowPartitions = {
+        L"system", L"system_dlkm", L"system_ext", L"vendor", L"product", L"odm",
+        L"my_bigball", L"my_carrier", L"my_engineering", L"my_heytap", L"my_manifest",
+        L"my_product", L"my_region", L"my_stock", L"odm_dlkm", L"vendor_dlkm"
+    };
+    vector<wstring> postFwPartitions = {
+        L"aop", L"aop_config", L"devcfg", L"hyp", L"imagefv", L"keymaster",
+        L"oplusstanvbk", L"qupfw", L"tz", L"uefisecapp", L"abl", L"xbl",
+        L"xbl_config", L"xbl_ramdump"
+    };
+    vector<wstring> sysPartitions = {
+        L"my_bigball", L"my_carrier", L"my_engineering", L"my_heytap", L"my_manifest",
+        L"my_product", L"my_region", L"my_stock", L"odm", L"product", L"system",
+        L"system_dlkm", L"system_ext", L"vendor", L"vendor_dlkm"
+    };
+    for (const wstring& s : preFwPartitions) {
+        fs::path imgPath = imagesDir / (s + L".img");
+        if (fs::exists(imgPath)) {
+            _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash " + s + L"_a \"" + imgPath.wstring() + L"\"\"").c_str());
+            _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash " + s + L"_b \"" + imgPath.wstring() + L"\"\"").c_str());
+        }
+        else {
+            if (s == L"cpucp_dtb") {
+                wcout << L"\n[略過] 未找到可選分區 " << s << L".img，已自動忽略\n";
+            }
+        }
+    }
+    cout << "\n正在進入Fastboot模式，請勿動手機和電腦\n";
+    _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" reboot fastboot\"").c_str());
+    cout << "\n請等待10秒...\n";
+    this_thread::sleep_for(chrono::seconds(10));
+    for (const wstring& s : cowPartitions) {
+        _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" delete-logical-partition " + s + L"_a-cow\"").c_str());
+        _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" delete-logical-partition " + s + L"_b-cow\"").c_str());
+    }
+    for (const wstring& s : postFwPartitions) {
+        fs::path imgPath = imagesDir / (s + L".img");
+        if (fs::exists(imgPath)) {
+            _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash " + s + L"_a \"" + imgPath.wstring() + L"\"\"").c_str());
+            _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash " + s + L"_b \"" + imgPath.wstring() + L"\"\"").c_str());
+        }
+        else {
+            if (s == L"oplusstanvbk") {
+                wcout << L"\n[略過] 未找到可選分區 " << s << L".img，已自動忽略\n";
+            }
+        }
+    }
+    for (const wstring& s : sysPartitions) {
+        fs::path imgPath = imagesDir / (s + L".img");
+        if (fs::exists(imgPath)) {
+            _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash " + s + L" \"" + imgPath.wstring() + L"\"\"").c_str());
+        }
+    }
+    cout << "\n請在手機選擇語言，並選擇格式化數據後重啟\n";
+    cout << "刷機完成，按任意鍵返回主頁\n";
+    system("pause > nul");
+    system("cls");
 }
