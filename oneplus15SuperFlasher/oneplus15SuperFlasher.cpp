@@ -166,6 +166,13 @@ void unPack() {
     //解包zip.
     fs::path updatezipPath = otaDir / L"update.zip";
     fs::path sevenZipPath = toolsDir / L"7z.exe";
+    if (!fs::exists(updatezipPath)) {
+        cout << "ERROR:系統找不到 /ota/update.zip \n";
+        cout << "請確認是否已將檔案改名為update.zip並放入ota資料夾下 \n";
+        system("pause");
+        system("cls");
+        return;
+    }
     //7z x "update.zip" "payload.bin" -o"ota"
     wstring UnpackZipCmd = L"\"\"" + sevenZipPath.wstring() + L"\" x \"" + updatezipPath.wstring() + L"\" \"payload.bin\" -o\"" + otaDir.wstring() + L"\"\"";
     int ZipResult = _wsystem(UnpackZipCmd.c_str());
@@ -175,8 +182,8 @@ void unPack() {
         system("pause > nul");
     }
     else {
-        cout << "ERROR:系統找不到 /ota/update.zip \n";
-        system("pause");
+        cout << "\nERROR: 解壓縮失敗，請確認 update.zip 是否損壞。\n";
+        system("pause > nul");
         system("cls");
         return;
     }
