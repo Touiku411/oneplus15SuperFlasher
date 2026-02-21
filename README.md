@@ -8,7 +8,7 @@
 ## 操作步驟
 
 ### Step 1: 準備更新包
-將下載好的 OnePlus 15 官方全量包 (`.zip`) 重新命名為 `update.zip`，並放入本工具目錄下的 `ota` 資料夾中。
+將下載好的 OnePlus 15 官方全量包 [downloadhere](https://roms.danielspringer.at/index.php?view=ota) 重新命名為 `update.zip`，並放入本工具目錄下的 `ota` 資料夾中。
 
 ### Step 2: 解包韌體
 執行 `oneplus15Flasher.exe`，輸入 `[2]` 選擇「解包全量包」。
