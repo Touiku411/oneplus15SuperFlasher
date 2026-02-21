@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -40,25 +40,18 @@ int main()
 {
     if (!fs::exists(imagesDir))
         fs::create_directory(imagesDir);
-    }
-    if (!fs::exists(otaDir)) {
-        fs::create_directory(imagesDir);
-    }
-    if (!fs::exists(toolsDir)) {
-        fs::create_directory(imagesDir);
-    }
-    cout << "---------ONEPLUS 15 升降級工具---------" << endl;
+    if (!fs::exists(otaDir))
+        fs::create_directory(otaDir);
+    if (!fs::exists(toolsDir))
+        fs::create_directory(toolsDir);
     int choice;
 
     while ((choice = enterChoice()) != 6) {
         switch (choice) {
         case 1:
-            test();
-            break;
-        case 2:
             unPack();
             break;
-        case 3:
+        case 2:
             ClearOTA();
             break;
         case 4:
