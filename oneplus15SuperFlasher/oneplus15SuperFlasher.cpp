@@ -9,6 +9,7 @@
 
 using namespace std;
 namespace fs = std::filesystem;
+void usbDriver();
 void Environment();
 void bootTobootloader();
 void bootToRecovery();
@@ -32,12 +33,13 @@ int enterChoice() {
         << "====================================================\n";
     cout << "\033[0m\n";
     cout << "=> 輸入你的選擇\n"
-        << "1.測試環境\n"
-        << "2.解包全量包\n"
-        << "3.清空ota資料夾\n"
-        << "4.清空images資料夾\n"
-        << "5.開始刷機\n"
-        << "6.END\n"
+        << "1.Install Android UsbDriver\n"
+        << "2.測試環境\n"
+        << "3.解包全量包\n"
+        << "4.清空ota資料夾\n"
+        << "5.清空images資料夾\n"
+        << "6.開始刷機\n"
+        << "7.END\n"
         << "? ";
     int choice;
     cin >> choice;
@@ -57,6 +59,7 @@ int enterChoice2() {
     return choice;
 }
 
+fs::path usbDir = L"usb_driver";
 fs::path otaDir = L"ota";
 fs::path imagesDir = L"images";
 fs::path toolsDir = L"tools";
@@ -75,21 +78,24 @@ int main()
         fs::create_directory(toolsDir);
     int choice;
 
-    while ((choice = enterChoice()) != 6) {
+    while ((choice = enterChoice()) != 7) {
         switch (choice) {
         case 1:
-            Environment();
+            usbDriver();
             break;
         case 2:
-            unPack();
+            Environment();
             break;
         case 3:
-            ClearOTA();
+            unPack();
             break;
         case 4:
-            ClearImages();
+            ClearOTA();
             break;
         case 5:
+            ClearImages();
+            break;
+        case 6:
             Start();
             break;
         default:
@@ -97,6 +103,16 @@ int main()
         }
     }
 
+}
+void usbDriver() {
+    //DPInst_x64.exe
+    fs::path DPInst_x64 = usbDir / L"DPInst_x64.exe";
+    int result = _wsystem((L"\"\"" + DPInst_x64.wstring() + L"\"\"").c_str());
+    if (result == 256) {
+        cout << "安裝完成!\n";
+    }
+    system("pause");
+    system("cls");
 }
 void Environment() {
     int choice;
