@@ -288,8 +288,10 @@ void shengjianji() {
     };
     //刷入img檔案
     fs::path modem_path = imagesDir / L"modem.img";
-    _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash modem_a \"" + modem_path.wstring() + L"\"\"").c_str());
-    _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash modem_b \"" + modem_path.wstring() + L"\"\"").c_str());
+    if (fs::exists(modem_path)) {
+        _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash modem_a \"" + modem_path.wstring() + L"\"\"").c_str());
+        _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" flash modem_b \"" + modem_path.wstring() + L"\"\"").c_str());
+    }
     cout << "\n正在進入Fastboot模式，請勿動手機和電腦\n";
     _wsystem((L"\"\"" + fastbootPath.wstring() + L"\" reboot fastboot\"").c_str());
     cout << "\n請等待10秒...\n";
