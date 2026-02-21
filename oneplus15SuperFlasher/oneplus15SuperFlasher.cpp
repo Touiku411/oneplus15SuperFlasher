@@ -22,9 +22,14 @@ int enterChoice() {
     cout << "       ---------ONEPLUS 15 升降級工具---------" << endl;
     cout << "\033[1;31m";
     cout << "====================================================\n"
-         << "!僅限[一加15]使用，若使用其他機型導致變磚，一概不負責!\n"
-         << "!請將ota包更改名稱為update.zip，並放入ota資料夾下!\n"
-         << "====================================================\n";
+        << "!僅限[一加15]使用，若使用其他機型導致變磚，一概不負責!\n"
+        << "!請將ota包更改名稱為update.zip，並放入ota資料夾下!\n"
+        << "!!!!!!!!!!!!!!!!!!!!!!\n"
+        << "!!!需解鎖bootloader!!!\n"
+        << "!!!需解鎖bootloader!!!\n"
+        << "!!!需解鎖bootloader!!!\n"
+        << "!!!!!!!!!!!!!!!!!!!!!!\n"
+        << "====================================================\n";
     cout << "\033[0m\n";
     cout << "=> 輸入你的選擇\n"
         << "1.測試環境\n"
@@ -72,24 +77,24 @@ int main()
 
     while ((choice = enterChoice()) != 6) {
         switch (choice) {
-            case 1:
-                Environment();
-                break;
-            case 2:
-                unPack();
-                break;
-            case 3:
-                ClearOTA();
-                break;
-            case 4:
-                ClearImages();
-                break;
-            case 5:
-                Start();
-                break;
-            default:
-                break;
-            }
+        case 1:
+            Environment();
+            break;
+        case 2:
+            unPack();
+            break;
+        case 3:
+            ClearOTA();
+            break;
+        case 4:
+            ClearImages();
+            break;
+        case 5:
+            Start();
+            break;
+        default:
+            break;
+        }
     }
 
 }
@@ -117,7 +122,7 @@ void Environment() {
             break;
         }
     }
-    
+    system("cls");
 }
 void bootTobootloader() {
     wstring cmd1 = L"\"\"" + adbPath.wstring() + L"\" reboot bootloader 2>nul\"";
@@ -166,7 +171,7 @@ void unPack() {
     int ZipResult = _wsystem(UnpackZipCmd.c_str());
     if (ZipResult == 0) {
         cout << "\n解壓縮update.zip成功\n"
-             << "按任意鍵繼續提取payload.bin....\n\n";
+            << "按任意鍵繼續提取payload.bin....\n\n";
         system("pause > nul");
     }
     else {
@@ -255,14 +260,14 @@ void Start() {
         }
     } while (choice < 1 || choice > 2);
     switch (choice) {
-        case 1:
-            shengjianji();
-            break;
-        case 2:
-            jiuzhuan();
-            break;
-        default:
-            break;
+    case 1:
+        shengjianji();
+        break;
+    case 2:
+        jiuzhuan();
+        break;
+    default:
+        break;
     }
 
 }
