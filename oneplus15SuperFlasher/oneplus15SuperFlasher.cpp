@@ -25,15 +25,11 @@ int enterChoice() {
     cout << "====================================================\n"
         << "!僅限[一加15]使用，若使用其他機型導致變磚，一概不負責!\n"
         << "!請將ota包更改名稱為update.zip，並放入ota資料夾下!\n"
-        << "!!!!!!!!!!!!!!!!!!!!!!\n"
-        << "!!!需解鎖bootloader!!!\n"
-        << "!!!需解鎖bootloader!!!\n"
-        << "!!!需解鎖bootloader!!!\n"
-        << "!!!!!!!!!!!!!!!!!!!!!!\n"
+        << "!若未解鎖bootloader，請勿使用本工具!\n"
         << "====================================================\n";
     cout << "\033[0m\n";
     cout << "=> 輸入你的選擇\n"
-        << "1.Install Android UsbDriver\n"
+        << "1.一鍵安裝驅動\n"
         << "2.測試環境\n"
         << "3.解包全量包\n"
         << "4.清空ota資料夾\n"
@@ -119,7 +115,7 @@ void Environment() {
     while ((choice = enterChoice2()) != 5) {
         switch (choice) {
         case 1:
-            cout << "\n若什麼都沒顯示代表adb沒識別到裝置，請先嘗試安裝驅動\n\n";
+            cout << "\n若只出現List of devices attached\n代表沒識別到裝置，請先嘗試安裝驅動\n\n";
             _wsystem((L"\"\"" + adbPath.wstring() + L"\" devices\"").c_str());
             system("pause");
             break;
