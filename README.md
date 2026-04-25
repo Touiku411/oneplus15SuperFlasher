@@ -1,5 +1,5 @@
 # OnePlus 15 (一加 15) 升降級工具
-
+## linux 用戶請參考 https://github.com/Touiku411/op15DGtools
 > - **僅限一加 15 使用！** 若使用其他機型導致變磚，一概不負責。
 > - **尚未解鎖 Bootloader 請勿使用！**
 * **支援機型：** 僅限 OnePlus 15 (一加 15)，請勿跨機型刷入！
